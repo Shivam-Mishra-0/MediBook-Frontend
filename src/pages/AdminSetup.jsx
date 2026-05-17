@@ -34,7 +34,7 @@ export default function AdminSetup() {
     }
 
     try {
-      const res = await axios.post('http://localhost:8080/auth/admin/register', {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/admin/register`, {
         fullName: form.fullName,
         email: form.email,
         password: form.password,
