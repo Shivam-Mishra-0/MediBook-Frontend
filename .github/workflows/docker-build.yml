@@ -40,7 +40,7 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
           build-args: |
-            VITE_API_BASE_URL=http://medi-book.duckdns.org:8080
+            VITE_API_BASE_URL=https://medi-book.duckdns.org
             VITE_RAZORPAY_KEY=${{ secrets.VITE_RAZORPAY_KEY }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
