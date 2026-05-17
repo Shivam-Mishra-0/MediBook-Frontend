@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 
-ARG VITE_API_BASE_URL=http://localhost:8080
+ARG VITE_API_BASE_URL=http://medi-book.duckdns.org:8080
 ARG VITE_RAZORPAY_KEY=
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 ENV VITE_RAZORPAY_KEY=${VITE_RAZORPAY_KEY}
