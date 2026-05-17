@@ -18,6 +18,10 @@ import { getUser, notifAPI, paymentAPI, providerAPI } from '../../utils/api';
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const user = getUser();
+
+  // ── Sidebar mobile toggle ──
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [providers, setProviders] = useState([]);
   const [revenue, setRevenue] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -62,68 +66,28 @@ export default function AdminDashboard() {
   const platformRevenue = Math.round(revenue * 0.1);
 
   const stats = [
-    {
-      icon: <Users size={22} />,
-      label: 'Total providers',
-      value: providers.length,
-      cls: 'stat-icon-blue',
-      path: '/admin/providers',
-    },
-    {
-      icon: <ShieldAlert size={22} />,
-      label: 'Pending review',
-      value: pendingVerification.length,
-      cls: 'stat-icon-yellow',
-      path: '/admin/providers',
-    },
-    {
-      icon: <CircleDollarSign size={22} />,
-      label: 'Total revenue',
-      value: `Rs ${revenue.toLocaleString()}`,
-      cls: 'stat-icon-green',
-      path: '/admin/payments',
-    },
-    {
-      icon: <TrendingUp size={22} />,
-      label: 'Platform share',
-      value: `Rs ${platformRevenue.toLocaleString()}`,
-      cls: 'stat-icon-red',
-      path: '/admin/payments',
-    },
+    { icon: <Users size={22} />,          label: 'Total providers', value: providers.length,                      cls: 'stat-icon-blue',   path: '/admin/providers' },
+    { icon: <ShieldAlert size={22} />,    label: 'Pending review',  value: pendingVerification.length,            cls: 'stat-icon-yellow', path: '/admin/providers' },
+    { icon: <CircleDollarSign size={22} />, label: 'Total revenue', value: `Rs ${revenue.toLocaleString()}`,      cls: 'stat-icon-green',  path: '/admin/payments' },
+    { icon: <TrendingUp size={22} />,     label: 'Platform share',  value: `Rs ${platformRevenue.toLocaleString()}`, cls: 'stat-icon-red', path: '/admin/payments' },
   ];
 
   const actions = [
-    {
-      icon: <Users size={20} />,
-      label: 'Manage users',
-      sub: 'Review accounts, access, and account health.',
-      path: '/admin/users',
-    },
-    {
-      icon: <UserCheck size={20} />,
-      label: 'Verify providers',
-      sub: 'Approve clinic identities and credential details.',
-      path: '/admin/providers',
-    },
-    {
-      icon: <CalendarDays size={20} />,
-      label: 'Appointments',
-      sub: 'Inspect booking activity across the platform.',
-      path: '/admin/appointments',
-    },
-    {
-      icon: <CircleDollarSign size={20} />,
-      label: 'Payments',
-      sub: 'Track revenue, refunds, and financial activity.',
-      path: '/admin/payments',
-    },
+    { icon: <Users size={20} />,      label: 'Manage users',     sub: 'Review accounts, access, and account health.',          path: '/admin/users' },
+    { icon: <UserCheck size={20} />,  label: 'Verify providers', sub: 'Approve clinic identities and credential details.',      path: '/admin/providers' },
+    { icon: <CalendarDays size={20} />, label: 'Appointments',   sub: 'Inspect booking activity across the platform.',          path: '/admin/appointments' },
+    { icon: <CircleDollarSign size={20} />, label: 'Payments',   sub: 'Track revenue, refunds, and financial activity.',        path: '/admin/payments' },
   ];
 
   return (
     <div className="dashboard-layout">
-      <AdminSidebar />
+      <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
       <div className="dashboard-main">
-        <Topbar title="Admin Dashboard" />
+        <Topbar
+          title="Admin Dashboard"
+          onMenuToggle={() => setSidebarOpen((prev) => !prev)}
+        />
         <div className="page-content fade-in">
           <div className="dashboard-page">
             <section className="dashboard-hero dashboard-hero-admin">
