@@ -28,7 +28,7 @@ export default function ProviderDashboard() {
   const navigate = useNavigate();
 
   // ── Sidebar mobile toggle ──
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // State is now managed by SidebarProvider context in Layout.jsx
 
   const [provider, setProvider] = useState(null);
   const [todayAppts, setTodayAppts] = useState([]);
@@ -120,13 +120,10 @@ export default function ProviderDashboard() {
 
   return (
     <div className="dashboard-layout">
-      <ProviderSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <ProviderSidebar />
 
       <div className="dashboard-main">
-        <Topbar
-          title="Provider Dashboard"
-          onMenuToggle={() => setSidebarOpen((prev) => !prev)}
-        />
+        <Topbar title="Provider Dashboard" />
         <div className="page-content fade-in">
           <div className="dashboard-page">
             <section className="dashboard-hero dashboard-hero-provider">

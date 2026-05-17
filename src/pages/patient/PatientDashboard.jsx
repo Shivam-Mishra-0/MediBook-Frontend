@@ -37,9 +37,6 @@ export default function PatientDashboard() {
   const navigate = useNavigate();
   const user = getUser();
 
-  // ── Sidebar mobile toggle ──
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const [upcoming, setUpcoming] = useState([]);
   const [completed, setCompleted] = useState([]);
   const [records, setRecords] = useState([]);
@@ -165,13 +162,10 @@ export default function PatientDashboard() {
 
   return (
     <div className="dashboard-layout">
-      <PatientSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <PatientSidebar />
 
       <div className="dashboard-main">
-        <Topbar
-          title="Patient Dashboard"
-          onMenuToggle={() => setSidebarOpen((prev) => !prev)}
-        />
+        <Topbar title="Patient Dashboard" />
         <div className="page-content fade-in">
           <div className="dashboard-page">
             <section className="dashboard-hero dashboard-hero-patient">

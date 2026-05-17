@@ -19,8 +19,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const user = getUser();
 
-  // ── Sidebar mobile toggle ──
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // ── Sidebar state now managed by SidebarProvider context in Layout.jsx
 
   const [providers, setProviders] = useState([]);
   const [revenue, setRevenue] = useState(0);
@@ -81,13 +80,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="dashboard-layout">
-      <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <AdminSidebar />
 
       <div className="dashboard-main">
-        <Topbar
-          title="Admin Dashboard"
-          onMenuToggle={() => setSidebarOpen((prev) => !prev)}
-        />
+        <Topbar title="Admin Dashboard" />
         <div className="page-content fade-in">
           <div className="dashboard-page">
             <section className="dashboard-hero dashboard-hero-admin">
