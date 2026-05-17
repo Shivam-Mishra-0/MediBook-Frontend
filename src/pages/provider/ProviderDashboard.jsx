@@ -26,6 +26,10 @@ const getPatientName = (patient) => {
 export default function ProviderDashboard() {
   const user = getUser();
   const navigate = useNavigate();
+
+  // ── Sidebar mobile toggle ──
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [provider, setProvider] = useState(null);
   const [todayAppts, setTodayAppts] = useState([]);
   const [allAppts, setAllAppts] = useState([]);
@@ -101,64 +105,28 @@ export default function ProviderDashboard() {
     todayAppts.find((appointment) => ['SCHEDULED', 'CONFIRMED'].includes(appointment.status)) || todayAppts[0];
 
   const stats = [
-    {
-      icon: <CalendarDays size={22} />,
-      label: "Today's appointments",
-      value: todayAppts.length,
-      cls: 'stat-icon-blue',
-    },
-    {
-      icon: <ClipboardList size={22} />,
-      label: 'Total appointments',
-      value: allAppts.length,
-      cls: 'stat-icon-green',
-    },
-    {
-      icon: <CheckCircle2 size={22} />,
-      label: 'Completed visits',
-      value: completedCount,
-      cls: 'stat-icon-yellow',
-    },
-    {
-      icon: <CircleDollarSign size={22} />,
-      label: 'Revenue tracked',
-      value: `Rs ${revenue.toLocaleString()}`,
-      cls: 'stat-icon-red',
-    },
+    { icon: <CalendarDays size={22} />, label: "Today's appointments", value: todayAppts.length, cls: 'stat-icon-blue' },
+    { icon: <ClipboardList size={22} />, label: 'Total appointments', value: allAppts.length, cls: 'stat-icon-green' },
+    { icon: <CheckCircle2 size={22} />, label: 'Completed visits', value: completedCount, cls: 'stat-icon-yellow' },
+    { icon: <CircleDollarSign size={22} />, label: 'Revenue tracked', value: `Rs ${revenue.toLocaleString()}`, cls: 'stat-icon-red' },
   ];
 
   const quickActions = [
-    {
-      icon: <CalendarDays size={20} />,
-      label: 'Manage schedule',
-      sub: 'Open slot controls and calendar availability.',
-      path: '/provider/schedule',
-    },
-    {
-      icon: <ClipboardList size={20} />,
-      label: 'Appointments',
-      sub: 'Review visit status and patient timelines.',
-      path: '/provider/appointments',
-    },
-    {
-      icon: <Stethoscope size={20} />,
-      label: 'Medical records',
-      sub: 'Write and update consultation records.',
-      path: '/provider/records',
-    },
-    {
-      icon: <CircleDollarSign size={20} />,
-      label: 'Earnings',
-      sub: 'Inspect revenue trends and payout context.',
-      path: '/provider/earnings',
-    },
+    { icon: <CalendarDays size={20} />, label: 'Manage schedule', sub: 'Open slot controls and calendar availability.', path: '/provider/schedule' },
+    { icon: <ClipboardList size={20} />, label: 'Appointments', sub: 'Review visit status and patient timelines.', path: '/provider/appointments' },
+    { icon: <Stethoscope size={20} />, label: 'Medical records', sub: 'Write and update consultation records.', path: '/provider/records' },
+    { icon: <CircleDollarSign size={20} />, label: 'Earnings', sub: 'Inspect revenue trends and payout context.', path: '/provider/earnings' },
   ];
 
   return (
     <div className="dashboard-layout">
-      <ProviderSidebar />
+      <ProviderSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
       <div className="dashboard-main">
-        <Topbar title="Provider Dashboard" />
+        <Topbar
+          title="Provider Dashboard"
+          onMenuToggle={() => setSidebarOpen((prev) => !prev)}
+        />
         <div className="page-content fade-in">
           <div className="dashboard-page">
             <section className="dashboard-hero dashboard-hero-provider">

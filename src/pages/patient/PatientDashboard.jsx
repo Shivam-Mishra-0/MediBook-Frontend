@@ -36,6 +36,10 @@ const getDoctorName = (provider) => {
 export default function PatientDashboard() {
   const navigate = useNavigate();
   const user = getUser();
+
+  // ── Sidebar mobile toggle ──
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [upcoming, setUpcoming] = useState([]);
   const [completed, setCompleted] = useState([]);
   const [records, setRecords] = useState([]);
@@ -161,9 +165,13 @@ export default function PatientDashboard() {
 
   return (
     <div className="dashboard-layout">
-      <PatientSidebar />
+      <PatientSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
       <div className="dashboard-main">
-        <Topbar title="Patient Dashboard" />
+        <Topbar
+          title="Patient Dashboard"
+          onMenuToggle={() => setSidebarOpen((prev) => !prev)}
+        />
         <div className="page-content fade-in">
           <div className="dashboard-page">
             <section className="dashboard-hero dashboard-hero-patient">
@@ -314,9 +322,7 @@ export default function PatientDashboard() {
                         <div className="dashboard-date-tile">
                           <strong>{new Date(appointment.appointmentDate).getDate()}</strong>
                           <span>
-                            {new Date(appointment.appointmentDate).toLocaleString('en', {
-                              month: 'short',
-                            })}
+                            {new Date(appointment.appointmentDate).toLocaleString('en', { month: 'short' })}
                           </span>
                         </div>
                         <div>
