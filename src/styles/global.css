@@ -2525,4 +2525,236 @@ tbody tr:last-child td { border-bottom: none; }
     flex-direction: column;
     align-items: stretch;
   }
+
+  /* ═══════════════════════════════════════════════
+   LAYOUT FIXES — paste at the bottom of your
+   existing global CSS file (index.css / App.css)
+═══════════════════════════════════════════════ */
+
+/* ── Tighten overall page scale ── */
+.page-content {
+  padding: 20px;
+}
+
+.dashboard-hero {
+  padding: 26px 28px;
+}
+
+.dashboard-hero-title {
+  font-size: clamp(1.65rem, 2.8vw, 2.5rem);
+}
+
+.dashboard-highlight-value {
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+}
+
+/* Stat cards less tall */
+.dashboard-metric-card {
+  min-height: auto;
+  padding: 16px 18px;
+}
+
+.stat-value {
+  font-size: 22px;
+}
+
+/* ── Sidebar — tighter width + mobile drawer ── */
+.sidebar {
+  width: 240px;
+  transition: transform 0.26s cubic-bezier(.4,0,.2,1);
+  z-index: 200;
+}
+
+.dashboard-main {
+  margin-left: 240px;
+}
+
+/* Mobile backdrop overlay */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(3px);
+  z-index: 199;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Sidebar close button (X) — hidden on desktop */
+.sidebar-close-btn {
+  display: none;
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Sidebar footer — separate logout button */
+.sidebar-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sidebar-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+/* ── Topbar hamburger button ── */
+.topbar-hamburger {
+  display: none;          /* hidden on desktop */
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.topbar-hamburger:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ── Topbar profile pill ── */
+.topbar-profile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.22s;
+  white-space: nowrap;
+}
+
+.topbar-profile-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.topbar-profile-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.topbar-profile-name {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Mobile breakpoint ── */
+@media (max-width: 768px) {
+  /* Show hamburger */
+  .topbar-hamburger {
+    display: flex;
+  }
+
+  /* Hide sidebar by default; .open class slides it in */
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Show backdrop & close button when open */
+  .sidebar.open ~ .sidebar-backdrop,
+  .sidebar-backdrop {
+    display: block;
+  }
+
+  .sidebar-close-btn {
+    display: flex;
+  }
+
+  .dashboard-main {
+    margin-left: 0;
+  }
+
+  .page-content {
+    padding: 14px;
+  }
+
+  .dashboard-hero {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /* Hide name on very small screens, just show avatar */
+  .topbar-profile-name {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .topbar-title {
+    font-size: 15px;
+  }
+}
 }
