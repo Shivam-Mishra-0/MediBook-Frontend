@@ -15,11 +15,17 @@ import {
   UserCircle,
   Sun,
   Moon,
+  Menu,
+  X,
+  ChevronRight,
 } from 'lucide-react';
 import { getUser, clearAuth, notifAPI, getInitials } from '../utils/api';
 import { useTheme } from '../context/ThemeContext';
 import medicalLogo from '../assets/medical-logo.png';
 
+/* ─────────────────────────────────────────
+   ThemeToggle
+───────────────────────────────────────── */
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   return (
@@ -33,6 +39,9 @@ export function ThemeToggle() {
   );
 }
 
+/* ─────────────────────────────────────────
+   NotificationBell
+───────────────────────────────────────── */
 export function NotificationBell() {
   const user = getUser();
   const [open, setOpen] = useState(false);
@@ -122,7 +131,10 @@ export function NotificationBell() {
   );
 }
 
-export function PatientSidebar() {
+/* ─────────────────────────────────────────
+   Sidebar inner — shared shell
+───────────────────────────────────────── */
+function SidebarShell({ portalLabel, navItems, avatarStyle, roleName, open, onClose }) {
   const navigate = useNavigate();
   const location = useLocation();
   const user = getUser();
@@ -133,164 +145,215 @@ export function PatientSidebar() {
     navigate('/');
   };
 
-  const navItems = [
-    { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: '/patient' },
-    { icon: <Calendar size={18} />, label: 'My Appointments', path: '/patient/appointments' },
-    { icon: <FileText size={18} />, label: 'Medical Records', path: '/patient/records' },
-    { icon: <CreditCard size={18} />, label: 'Payments', path: '/patient/payments' },
-    { icon: <Search size={18} />, label: 'Find Doctors', path: '/find-doctors' },
-    { icon: <UserCircle size={18} />, label: 'My Profile', path: '/patient/profile' },
-  ];
-
-  return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="sidebar-brand-logo"><span className="brand-emblem"><img src={medicalLogo} alt="" className="medical-brand-icon" /></span> Medi<span>Book</span></div>
-        <div className="sidebar-brand-sub">Patient Portal</div>
-      </div>
-      <nav className="sidebar-nav">
-        <div className="sidebar-section-label">Navigation</div>
-        {navItems.map((item) => (
-          <div
-            key={item.path}
-            className={`sidebar-link ${isActive(item.path) ? 'active' : ''}`}
-            onClick={() => navigate(item.path)}
-          >
-            {item.icon}
-            {item.label}
-          </div>
-        ))}
-      </nav>
-      <div className="sidebar-footer">
-        <div className="sidebar-user" onClick={logout}>
-          <div className="avatar" style={{ width: 36, height: 36, fontSize: 14 }}>{getInitials(user?.fullName)}</div>
-          <div>
-            <div className="sidebar-user-name">{user?.fullName || 'Patient'}</div>
-            <div className="sidebar-user-role">Patient</div>
-          </div>
-          <LogOut size={16} style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.4)' }} />
-        </div>
-      </div>
-    </aside>
-  );
-}
-
-export function ProviderSidebar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const user = getUser();
-  const isActive = (p) => location.pathname === p;
-  const logout = () => {
-    clearAuth();
-    navigate('/');
+  const handleNavClick = (path) => {
+    navigate(path);
+    if (onClose) onClose(); // close drawer on mobile after navigation
   };
 
-  const navItems = [
-    { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: '/provider' },
-    { icon: <Calendar size={18} />, label: 'My Schedule', path: '/provider/schedule' },
-    { icon: <ClipboardList size={18} />, label: 'Appointments', path: '/provider/appointments' },
-    { icon: <FileText size={18} />, label: 'Medical Records', path: '/provider/records' },
-    { icon: <TrendingUp size={18} />, label: 'Earnings', path: '/provider/earnings' },
-    { icon: <UserCircle size={18} />, label: 'My Profile', path: '/provider/profile' },
-  ];
-
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="sidebar-brand-logo"><span className="brand-emblem"><img src={medicalLogo} alt="" className="medical-brand-icon" /></span> Medi<span>Book</span></div>
-        <div className="sidebar-brand-sub">Provider Portal</div>
-      </div>
-      <nav className="sidebar-nav">
-        <div className="sidebar-section-label">Navigation</div>
-        {navItems.map((item) => (
-          <div
-            key={item.path}
-            className={`sidebar-link ${isActive(item.path) ? 'active' : ''}`}
-            onClick={() => navigate(item.path)}
-          >
-            {item.icon}
-            {item.label}
+    <>
+      {/* Mobile overlay backdrop */}
+      {open && (
+        <div
+          className="sidebar-backdrop"
+          onClick={onClose}
+        />
+      )}
+
+      <aside className={`sidebar ${open ? 'open' : ''}`}>
+        {/* Close button — visible only on mobile */}
+        <button className="sidebar-close-btn" onClick={onClose} title="Close menu">
+          <X size={18} />
+        </button>
+
+        <div className="sidebar-brand">
+          <div className="sidebar-brand-logo">
+            <span className="brand-emblem">
+              <img src={medicalLogo} alt="" className="medical-brand-icon" />
+            </span>
+            Medi<span>Book</span>
           </div>
-        ))}
-      </nav>
-      <div className="sidebar-footer">
-        <div className="sidebar-user" onClick={logout}>
-          <div className="avatar" style={{ width: 36, height: 36, fontSize: 14, background: 'var(--secondary-light)', color: 'var(--secondary)' }}>{getInitials(user?.fullName)}</div>
-          <div>
-            <div className="sidebar-user-name">{user?.fullName || 'Doctor'}</div>
-            <div className="sidebar-user-role">Provider</div>
-          </div>
-          <LogOut size={16} style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.4)' }} />
+          <div className="sidebar-brand-sub">{portalLabel}</div>
         </div>
-      </div>
-    </aside>
+
+        <nav className="sidebar-nav">
+          <div className="sidebar-section-label">Navigation</div>
+          {navItems.map((item) => (
+            <div
+              key={item.path}
+              className={`sidebar-link ${isActive(item.path) ? 'active' : ''}`}
+              onClick={() => handleNavClick(item.path)}
+            >
+              {item.icon}
+              {item.label}
+            </div>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          {/* Profile row — navigates to profile page */}
+          <div
+            className="sidebar-user"
+            onClick={() => handleNavClick(navItems.find(i => i.path.includes('profile'))?.path || '/')}
+            title="View profile"
+            style={{ marginBottom: 6 }}
+          >
+            <div className="avatar" style={{ width: 36, height: 36, fontSize: 14, ...avatarStyle }}>
+              {getInitials(user?.fullName)}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="sidebar-user-name" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {user?.fullName || roleName}
+              </div>
+              <div className="sidebar-user-role">{roleName}</div>
+            </div>
+            <ChevronRight size={14} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
+          </div>
+
+          {/* Logout button — separate, clearly labelled */}
+          <button className="sidebar-logout-btn" onClick={logout}>
+            <LogOut size={15} />
+            Sign out
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
 
-export function AdminSidebar() {
+/* ─────────────────────────────────────────
+   PatientSidebar
+───────────────────────────────────────── */
+export function PatientSidebar({ open, onClose }) {
+  const navItems = [
+    { icon: <LayoutDashboard size={18} />, label: 'Dashboard',       path: '/patient' },
+    { icon: <Calendar size={18} />,        label: 'My Appointments', path: '/patient/appointments' },
+    { icon: <FileText size={18} />,        label: 'Medical Records', path: '/patient/records' },
+    { icon: <CreditCard size={18} />,      label: 'Payments',        path: '/patient/payments' },
+    { icon: <Search size={18} />,          label: 'Find Doctors',    path: '/find-doctors' },
+    { icon: <UserCircle size={18} />,      label: 'My Profile',      path: '/patient/profile' },
+  ];
+
+  return (
+    <SidebarShell
+      portalLabel="Patient Portal"
+      navItems={navItems}
+      avatarStyle={{}}
+      roleName="Patient"
+      open={open}
+      onClose={onClose}
+    />
+  );
+}
+
+/* ─────────────────────────────────────────
+   ProviderSidebar
+───────────────────────────────────────── */
+export function ProviderSidebar({ open, onClose }) {
+  const navItems = [
+    { icon: <LayoutDashboard size={18} />, label: 'Dashboard',       path: '/provider' },
+    { icon: <Calendar size={18} />,        label: 'My Schedule',     path: '/provider/schedule' },
+    { icon: <ClipboardList size={18} />,   label: 'Appointments',    path: '/provider/appointments' },
+    { icon: <FileText size={18} />,        label: 'Medical Records', path: '/provider/records' },
+    { icon: <TrendingUp size={18} />,      label: 'Earnings',        path: '/provider/earnings' },
+    { icon: <UserCircle size={18} />,      label: 'My Profile',      path: '/provider/profile' },
+  ];
+
+  return (
+    <SidebarShell
+      portalLabel="Provider Portal"
+      navItems={navItems}
+      avatarStyle={{ background: 'var(--secondary-light)', color: 'var(--secondary)' }}
+      roleName="Provider"
+      open={open}
+      onClose={onClose}
+    />
+  );
+}
+
+/* ─────────────────────────────────────────
+   AdminSidebar
+───────────────────────────────────────── */
+export function AdminSidebar({ open, onClose }) {
+  const navItems = [
+    { icon: <LayoutDashboard size={18} />, label: 'Dashboard',    path: '/admin' },
+    { icon: <Users size={18} />,           label: 'Users',        path: '/admin/users' },
+    { icon: <UserCheck size={18} />,       label: 'Providers',    path: '/admin/providers' },
+    { icon: <Calendar size={18} />,        label: 'Appointments', path: '/admin/appointments' },
+    { icon: <CreditCard size={18} />,      label: 'Payments',     path: '/admin/payments' },
+    { icon: <UserCircle size={18} />,      label: 'My Profile',   path: '/admin/profile' },
+  ];
+
+  return (
+    <SidebarShell
+      portalLabel="Admin Panel"
+      navItems={navItems}
+      avatarStyle={{ background: 'var(--warning-light)', color: 'var(--warning)' }}
+      roleName="Administrator"
+      open={open}
+      onClose={onClose}
+    />
+  );
+}
+
+/* ─────────────────────────────────────────
+   Topbar  — now has hamburger + profile
+───────────────────────────────────────── */
+export function Topbar({ title, onMenuToggle }) {
   const navigate = useNavigate();
-  const location = useLocation();
   const user = getUser();
-  const isActive = (p) => location.pathname === p;
-  const logout = () => {
-    clearAuth();
-    navigate('/');
-  };
 
-  const navItems = [
-    { icon: <LayoutDashboard size={18} />, label: 'Dashboard', path: '/admin' },
-    { icon: <Users size={18} />, label: 'Users', path: '/admin/users' },
-    { icon: <UserCheck size={18} />, label: 'Providers', path: '/admin/providers' },
-    { icon: <Calendar size={18} />, label: 'Appointments', path: '/admin/appointments' },
-    { icon: <CreditCard size={18} />, label: 'Payments', path: '/admin/payments' },
-    { icon: <UserCircle size={18} />, label: 'My Profile', path: '/admin/profile' },
-  ];
+  // Derive profile path from role stored in user object
+  const profilePath = (() => {
+    const role = user?.role?.toLowerCase();
+    if (role === 'provider') return '/provider/profile';
+    if (role === 'admin')    return '/admin/profile';
+    return '/patient/profile';
+  })();
 
-  return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="sidebar-brand-logo"><span className="brand-emblem"><img src={medicalLogo} alt="" className="medical-brand-icon" /></span> Medi<span>Book</span></div>
-        <div className="sidebar-brand-sub">Admin Panel</div>
-      </div>
-      <nav className="sidebar-nav">
-        <div className="sidebar-section-label">Management</div>
-        {navItems.map((item) => (
-          <div
-            key={item.path}
-            className={`sidebar-link ${isActive(item.path) ? 'active' : ''}`}
-            onClick={() => navigate(item.path)}
-          >
-            {item.icon}
-            {item.label}
-          </div>
-        ))}
-      </nav>
-      <div className="sidebar-footer">
-        <div className="sidebar-user" onClick={logout}>
-          <div className="avatar" style={{ width: 36, height: 36, fontSize: 14, background: 'var(--warning-light)', color: 'var(--warning)' }}>{getInitials(user?.fullName)}</div>
-          <div>
-            <div className="sidebar-user-name">{user?.fullName || 'Admin'}</div>
-            <div className="sidebar-user-role">Administrator</div>
-          </div>
-          <LogOut size={16} style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.4)' }} />
-        </div>
-      </div>
-    </aside>
-  );
-}
+  const initials = getInitials(user?.fullName) || 'U';
 
-export function Topbar({ title }) {
+  // First name only for compact display
+  const firstName = user?.fullName?.split(' ')[0] || 'Profile';
+
   return (
     <div className="topbar">
-      <span className="topbar-title">{title}</span>
+      {/* Left: hamburger (mobile) + title */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <button
+          className="topbar-hamburger"
+          onClick={onMenuToggle}
+          title="Toggle menu"
+          aria-label="Toggle sidebar"
+        >
+          <Menu size={20} />
+        </button>
+        <span className="topbar-title">{title}</span>
+      </div>
+
+      {/* Right: theme, bell, profile */}
       <div className="topbar-actions">
         <ThemeToggle />
         <NotificationBell />
+
+        {/* ── Profile pill ── */}
+        <button
+          className="topbar-profile-btn"
+          onClick={() => navigate(profilePath)}
+          title="My profile"
+        >
+          <div className="topbar-profile-avatar">{initials}</div>
+          <span className="topbar-profile-name">{firstName}</span>
+          <ChevronRight size={13} style={{ opacity: 0.5 }} />
+        </button>
       </div>
     </div>
   );
 }
 
+/* ─────────────────────────────────────────
+   Remaining unchanged exports
+───────────────────────────────────────── */
 export function Stars({ rating = 0, size = 14 }) {
   return (
     <div className="stars">
@@ -306,13 +369,13 @@ export function StatusBadge({ status }) {
     SCHEDULED: 'badge-blue',
     COMPLETED: 'badge-green',
     CANCELLED: 'badge-red',
-    NO_SHOW: 'badge-yellow',
-    SUCCESS: 'badge-green',
-    FAILED: 'badge-red',
-    REFUNDED: 'badge-gray',
-    PENDING: 'badge-yellow',
-    true: 'badge-green',
-    false: 'badge-red',
+    NO_SHOW:   'badge-yellow',
+    SUCCESS:   'badge-green',
+    FAILED:    'badge-red',
+    REFUNDED:  'badge-gray',
+    PENDING:   'badge-yellow',
+    true:      'badge-green',
+    false:     'badge-red',
   };
   return <span className={`badge ${map[status] || 'badge-gray'}`}>{String(status)}</span>;
 }
@@ -341,7 +404,12 @@ export function ToastContainer() {
   }, [toast]);
 
   if (!toast) return null;
-  const types = { success: 'alert-success', error: 'alert-error', info: 'alert-info', warning: 'alert-warning' };
+  const types = {
+    success: 'alert-success',
+    error:   'alert-error',
+    info:    'alert-info',
+    warning: 'alert-warning',
+  };
 
   return (
     <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999, minWidth: 280, maxWidth: 400, animation: 'slideInRight 0.3s cubic-bezier(.34,1.56,.64,1)' }}>
@@ -356,8 +424,8 @@ export function ToastContainer() {
 
 export const toast = {
   success: (msg) => _setToast?.({ type: 'success', message: msg }),
-  error: (msg) => _setToast?.({ type: 'error', message: msg }),
-  info: (msg) => _setToast?.({ type: 'info', message: msg }),
+  error:   (msg) => _setToast?.({ type: 'error',   message: msg }),
+  info:    (msg) => _setToast?.({ type: 'info',     message: msg }),
 };
 
 export function PublicNav() {
@@ -366,9 +434,9 @@ export function PublicNav() {
 
   const getDashPath = () => {
     if (!user) return '/login';
-    if (user.role === 'Patient') return '/patient';
+    if (user.role === 'Patient')  return '/patient';
     if (user.role === 'Provider') return '/provider';
-    if (user.role === 'Admin') return '/admin';
+    if (user.role === 'Admin')    return '/admin';
     return '/';
   };
 
@@ -376,13 +444,15 @@ export function PublicNav() {
     <nav className="topnav">
       <div className="container topnav-inner">
         <div className="topnav-logo topnav-logo-premium" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          <span className="brand-emblem"><img src={medicalLogo} alt="" className="medical-brand-icon" /></span>
-          <span className="topnav-logo-text">
-            Medi<span>Book</span>
+          <span className="brand-emblem">
+            <img src={medicalLogo} alt="" className="medical-brand-icon" />
           </span>
+          <span className="topnav-logo-text">Medi<span>Book</span></span>
         </div>
         <div className="topnav-links">
-          <span className="topnav-link" onClick={() => navigate('/find-doctors')} style={{ cursor: 'pointer' }}>Find Doctors</span>
+          <span className="topnav-link" onClick={() => navigate('/find-doctors')} style={{ cursor: 'pointer' }}>
+            Find Doctors
+          </span>
           <ThemeToggle />
           {user ? (
             <button className="btn btn-primary btn-sm" onClick={() => navigate(getDashPath())}>Dashboard</button>
