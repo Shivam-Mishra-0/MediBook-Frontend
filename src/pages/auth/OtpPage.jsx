@@ -129,7 +129,7 @@ export default function OtpPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:8080/auth/verify-otp', {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp: otpCode }),
@@ -174,7 +174,7 @@ export default function OtpPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:8080/auth/resend-otp', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
