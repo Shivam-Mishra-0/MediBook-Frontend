@@ -2525,7 +2525,7 @@ tbody tr:last-child td { border-bottom: none; }
     flex-direction: column;
     align-items: stretch;
   }
-
+}
   /* ═══════════════════════════════════════════════
    LAYOUT FIXES — paste at the bottom of your
    existing global CSS file (index.css / App.css)
@@ -2711,7 +2711,7 @@ tbody tr:last-child td { border-bottom: none; }
   }
 
   /* Show backdrop & close button when open */
-  .sidebar.open ~ .sidebar-backdrop,
+  /* .sidebar.open ~ .sidebar-backdrop, */
   .sidebar-backdrop {
     display: block;
   }
@@ -2757,4 +2757,4 @@ tbody tr:last-child td { border-bottom: none; }
     font-size: 15px;
   }
 }
-}
+

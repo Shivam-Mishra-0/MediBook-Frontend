@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './styles/global.css';
+import { SidebarProvider } from './components/Layout';
 
 // Public Pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -112,6 +113,7 @@ function AppFallback() {
 export default function App() {
   return (
     <BrowserRouter>
+    <SidebarProvider>
       <Suspense fallback={<AppFallback />}>
         <Routes>
           {/* Public */}
@@ -157,6 +159,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+      </SidebarProvider>
     </BrowserRouter>
   );
 }

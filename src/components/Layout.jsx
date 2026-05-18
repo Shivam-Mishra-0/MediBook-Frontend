@@ -1,5 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+
+/* ─────────────────────────────────────────
+   Sidebar Context — persists open state
+   across all pages/navigation
+───────────────────────────────────────── */
+const SidebarContext = createContext({ open: false, setOpen: () => {} });
+
+export function SidebarProvider({ children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <SidebarContext.Provider value={{ open, setOpen }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+}
+
+function useSidebar() {
+  return useContext(SidebarContext);
+}
 import {
   LayoutDashboard,
   Calendar,
@@ -134,11 +153,20 @@ export function NotificationBell() {
 /* ─────────────────────────────────────────
    Sidebar inner — shared shell
 ───────────────────────────────────────── */
-function SidebarShell({ portalLabel, navItems, avatarStyle, roleName, open, onClose }) {
+function SidebarShell({ portalLabel, navItems, avatarStyle, roleName }) {
   const navigate = useNavigate();
   const location = useLocation();
   const user = getUser();
+  const { open, setOpen } = useSidebar();
   const isActive = (p) => location.pathname === p;
+
+  // Auto-close on every route change — fixes hamburger not working
+  // after navigating between pages
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  const onClose = () => setOpen(false);
 
   const logout = () => {
     clearAuth();
@@ -147,7 +175,7 @@ function SidebarShell({ portalLabel, navItems, avatarStyle, roleName, open, onCl
 
   const handleNavClick = (path) => {
     navigate(path);
-    if (onClose) onClose(); // close drawer on mobile after navigation
+    setOpen(false);
   };
 
   return (
@@ -224,7 +252,7 @@ function SidebarShell({ portalLabel, navItems, avatarStyle, roleName, open, onCl
 /* ─────────────────────────────────────────
    PatientSidebar
 ───────────────────────────────────────── */
-export function PatientSidebar({ open, onClose }) {
+export function PatientSidebar() {
   const navItems = [
     { icon: <LayoutDashboard size={18} />, label: 'Dashboard',       path: '/patient' },
     { icon: <Calendar size={18} />,        label: 'My Appointments', path: '/patient/appointments' },
@@ -240,8 +268,6 @@ export function PatientSidebar({ open, onClose }) {
       navItems={navItems}
       avatarStyle={{}}
       roleName="Patient"
-      open={open}
-      onClose={onClose}
     />
   );
 }
@@ -249,7 +275,7 @@ export function PatientSidebar({ open, onClose }) {
 /* ─────────────────────────────────────────
    ProviderSidebar
 ───────────────────────────────────────── */
-export function ProviderSidebar({ open, onClose }) {
+export function ProviderSidebar() {
   const navItems = [
     { icon: <LayoutDashboard size={18} />, label: 'Dashboard',       path: '/provider' },
     { icon: <Calendar size={18} />,        label: 'My Schedule',     path: '/provider/schedule' },
@@ -265,8 +291,6 @@ export function ProviderSidebar({ open, onClose }) {
       navItems={navItems}
       avatarStyle={{ background: 'var(--secondary-light)', color: 'var(--secondary)' }}
       roleName="Provider"
-      open={open}
-      onClose={onClose}
     />
   );
 }
@@ -274,7 +298,7 @@ export function ProviderSidebar({ open, onClose }) {
 /* ─────────────────────────────────────────
    AdminSidebar
 ───────────────────────────────────────── */
-export function AdminSidebar({ open, onClose }) {
+export function AdminSidebar() {
   const navItems = [
     { icon: <LayoutDashboard size={18} />, label: 'Dashboard',    path: '/admin' },
     { icon: <Users size={18} />,           label: 'Users',        path: '/admin/users' },
@@ -290,8 +314,6 @@ export function AdminSidebar({ open, onClose }) {
       navItems={navItems}
       avatarStyle={{ background: 'var(--warning-light)', color: 'var(--warning)' }}
       roleName="Administrator"
-      open={open}
-      onClose={onClose}
     />
   );
 }
@@ -299,11 +321,11 @@ export function AdminSidebar({ open, onClose }) {
 /* ─────────────────────────────────────────
    Topbar  — now has hamburger + profile
 ───────────────────────────────────────── */
-export function Topbar({ title, onMenuToggle }) {
+export function Topbar({ title }) {
   const navigate = useNavigate();
   const user = getUser();
+  const { setOpen } = useSidebar();
 
-  // Derive profile path from role stored in user object
   const profilePath = (() => {
     const role = user?.role?.toLowerCase();
     if (role === 'provider') return '/provider/profile';
@@ -312,17 +334,14 @@ export function Topbar({ title, onMenuToggle }) {
   })();
 
   const initials = getInitials(user?.fullName) || 'U';
-
-  // First name only for compact display
   const firstName = user?.fullName?.split(' ')[0] || 'Profile';
 
   return (
     <div className="topbar">
-      {/* Left: hamburger (mobile) + title */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <button
           className="topbar-hamburger"
-          onClick={onMenuToggle}
+          onClick={() => setOpen((prev) => !prev)}
           title="Toggle menu"
           aria-label="Toggle sidebar"
         >
@@ -331,12 +350,9 @@ export function Topbar({ title, onMenuToggle }) {
         <span className="topbar-title">{title}</span>
       </div>
 
-      {/* Right: theme, bell, profile */}
       <div className="topbar-actions">
         <ThemeToggle />
         <NotificationBell />
-
-        {/* ── Profile pill ── */}
         <button
           className="topbar-profile-btn"
           onClick={() => navigate(profilePath)}
