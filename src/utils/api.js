@@ -205,6 +205,7 @@ export const paymentAPI = {
   refund: (id) => api.post(`/payments/${id}/refund`),
   getByStatus: (status) => api.get(`/payments/status?status=${status}`),
   getTotalRevenue: () => api.get('/payments/revenue/total'),
+  getRevenueByProvider: (providerId) => api.get(`/payments/revenue/provider/${providerId}`),
   updateStatus: (id, status) =>
     api.put(`/payments/${id}/status?status=${status}`),
 };

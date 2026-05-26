@@ -51,7 +51,7 @@ export default function ProviderDashboard() {
         const [todayResponse, allResponse, revenueResponse] = await Promise.all([
           appointmentAPI.getByProviderDate(providerId, today),
           appointmentAPI.getByProvider(providerId),
-          paymentAPI.getTotalRevenue(),
+          paymentAPI.getRevenueByProvider(providerId),
         ]);
 
         const allAppointments = allResponse.data || [];
@@ -59,7 +59,7 @@ export default function ProviderDashboard() {
 
         setTodayAppts(todayResponse.data || []);
         setAllAppts(allAppointments);
-        setRevenue(revenueResponse.data.totalRevenue || 0);
+        setRevenue(revenueResponse.data.providerRevenue || 0);
         setCancelledAppts(cancelled);
 
         const uniquePatientIds = [...new Set(cancelled.map((appointment) => appointment.patientId))];
