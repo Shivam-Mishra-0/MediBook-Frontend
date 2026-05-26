@@ -516,7 +516,7 @@ export default function BookAppointmentPage() {
                 <div className="form-group">
                   <label className="form-label">Consultation Fee (₹)</label>
                   <input className="form-input" type="number" value={amount}
-                    onChange={e => setAmount(e.target.value)} min="1" />
+                    readOnly style={{ cursor: 'not-allowed', backgroundColor: 'var(--bg-secondary)' }} />
                 </div>
 
                 {/* Payment Method */}
