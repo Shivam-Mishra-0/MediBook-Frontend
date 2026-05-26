@@ -103,12 +103,23 @@ api.interceptors.request.use((config) => {
 });
 
 // Handle 401 globally
+// Handle 401 globally
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      clearAuth();
-      window.location.href = '/login';
+      // Don't redirect if already on login/auth pages
+      const isAuthPage = window.location.pathname.startsWith('/login')
+        || window.location.pathname.startsWith('/register')
+        || window.location.pathname.startsWith('/forgot-password')
+        || window.location.pathname.startsWith('/reset-password')
+        || window.location.pathname.startsWith('/otp')
+        || window.location.pathname.startsWith('/add-phone');
+
+      if (!isAuthPage) {
+        clearAuth();
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(err);
   }
