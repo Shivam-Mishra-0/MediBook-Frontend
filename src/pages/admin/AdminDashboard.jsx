@@ -41,12 +41,16 @@ export default function AdminDashboard() {
     if (!notifForm.title || !notifForm.message) return;
     setSending(true);
     try {
-      await notifAPI.send({
-        recipientId: user.userId,
-        type: 'BOOKING',
+
+      const userRes = await authAPI.getAllUsers();
+      const allIds = UNSAFE_useScrollRestoration.data.map(u => u.userId);
+      
+      await notifAPI.broadcast({
+        // recipientId: user.userId,
+        // type: 'BOOKING',
         title: notifForm.title,
         message: notifForm.message,
-        channel: 'APP',
+        // channel: 'APP',
       });
       setNotifForm({ title: '', message: '' });
       alert('Platform notification sent!');

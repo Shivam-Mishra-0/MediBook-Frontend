@@ -10,17 +10,34 @@ export default function AdminUsers() {
   const [actionLoading, setActionLoading] = useState(null);
 
   // Mock users for demonstration (real implementation would require /users/all endpoint)
-  const [users] = useState([
-    { userId: 1, fullName: 'Admin User', email: 'admin@medibook.com', role: 'Admin', isActive: true, createdAt: '2026-01-01' },
-    { userId: 2, fullName: 'Dr. Priya Sharma', email: 'priya@example.com', role: 'Provider', isActive: true, createdAt: '2026-01-10' },
-    { userId: 3, fullName: 'Rahul Verma', email: 'rahul@example.com', role: 'Patient', isActive: true, createdAt: '2026-01-15' },
-    { userId: 4, fullName: 'Dr. Arjun Mehta', email: 'arjun@example.com', role: 'Provider', isActive: true, createdAt: '2026-02-01' },
-    { userId: 5, fullName: 'Sneha Patel', email: 'sneha@example.com', role: 'Patient', isActive: false, createdAt: '2026-02-10' },
-    { userId: 6, fullName: 'Dr. Kavita Nair', email: 'kavita@example.com', role: 'Provider', isActive: true, createdAt: '2026-02-15' },
-    { userId: 7, fullName: 'Aditya Kumar', email: 'aditya@example.com', role: 'Patient', isActive: true, createdAt: '2026-03-01' },
-  ]);
+  // const [users] = useState([
+  //   { userId: 1, fullName: 'Admin User', email: 'admin@medibook.com', role: 'Admin', isActive: true, createdAt: '2026-01-01' },
+  //   { userId: 2, fullName: 'Dr. Priya Sharma', email: 'priya@example.com', role: 'Provider', isActive: true, createdAt: '2026-01-10' },
+  //   { userId: 3, fullName: 'Rahul Verma', email: 'rahul@example.com', role: 'Patient', isActive: true, createdAt: '2026-01-15' },
+  //   { userId: 4, fullName: 'Dr. Arjun Mehta', email: 'arjun@example.com', role: 'Provider', isActive: true, createdAt: '2026-02-01' },
+  //   { userId: 5, fullName: 'Sneha Patel', email: 'sneha@example.com', role: 'Patient', isActive: false, createdAt: '2026-02-10' },
+  //   { userId: 6, fullName: 'Dr. Kavita Nair', email: 'kavita@example.com', role: 'Provider', isActive: true, createdAt: '2026-02-15' },
+  //   { userId: 7, fullName: 'Aditya Kumar', email: 'aditya@example.com', role: 'Patient', isActive: true, createdAt: '2026-03-01' },
+  // ]);
 
-  const [localUsers, setLocalUsers] = useState(users);
+  //const [users, setUsers] = useState([]);
+  const [localUsers, setLocalUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await authAPI.getAllUsers();
+        //setUsers(res.data);
+        setLocalUsers(res.data);
+      } catch (e) {
+        alert('Failed to load users');
+      } finally { setLoading(false); }
+    };
+    fetchUsers();
+  }, []);
+
+  //const [localUsers, setLocalUsers] = useState([]);
   const [tab, setTab] = useState('all');
 
   const filtered = localUsers.filter(u => {
@@ -35,6 +52,18 @@ export default function AdminUsers() {
     try {
       await authAPI.deactivate(userId);
       setLocalUsers(prev => prev.map(u => u.userId === userId ? { ...u, isActive: false } : u));
+    } catch (e) { alert(e.response?.data?.message || 'Error'); }
+    finally { setActionLoading(null); }
+  };
+
+  const reactivate = async (userId) => {
+    if (!confirm('Reactivate this user account?')) return;
+    setActionLoading(userId + 'r');
+    try {
+      await authAPI.reactivate(userId);
+      setLocalUsers(prev =>
+        prev.map(u => u.userId === userId ? { ...u, isActive: true } : u)
+      );
     } catch (e) { alert(e.response?.data?.message || 'Error'); }
     finally { setActionLoading(null); }
   };
@@ -128,6 +157,7 @@ export default function AdminUsers() {
                           {u.isActive ? '● Active' : '● Inactive'}
                         </span>
                       </td>
+                      
                       <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>{formatDate(u.createdAt)}</td>
                       <td>
                         <div style={{ display: 'flex', gap: 6 }}>
@@ -135,6 +165,12 @@ export default function AdminUsers() {
                             <button className="btn btn-danger btn-sm" onClick={() => deactivate(u.userId)}
                               disabled={actionLoading === u.userId + 'd'} title="Deactivate">
                               <UserX size={13} />
+                            </button>
+                          )}
+                          {!u.isActive && (                          
+                            <button className="btn btn-success btn-sm" onClick={() => reactivate(u.userId)}
+                              disabled={actionLoading === u.userId + 'r'} title="Reactivate">
+                              <UserCheck size={13} />
                             </button>
                           )}
                           <button className="btn btn-outline btn-sm" onClick={() => changePassword(u.userId)} title="Reset Password">

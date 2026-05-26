@@ -120,10 +120,12 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   logout: () => api.post('/auth/logout'),
   getProfile: (userId, config = {}) => api.get(`/auth/profile/${userId}`, config),
+  getAllUsers: () => api.get('/admin/users'),
   updateProfile: (userId, data) => api.put(`/auth/profile/${userId}`, data),
   changePassword: (userId, newPassword) =>
     api.put(`/auth/password/${userId}`, { newPassword }),
   deactivate: (userId) => api.put(`/auth/deactivate/${userId}`),
+  reactivate:  (id) => api.put(`/admin/users/${id}/reactivate`),
 };
 
 // ── PROVIDERS ─────────────────────────────────────
@@ -223,6 +225,7 @@ export const reviewAPI = {
 export const notifAPI = {
   send: (data) => api.post('/notifications/send', data),
   sendBulk: (data) => api.post('/notifications/bulk', data),
+  broadcast: (data) => api.post('/notifications/broadcast', data),
   getByRecipient: (id) => api.get(`/notifications/recipient/${id}`),
   getUnreadCount: (id) => api.get(`/notifications/unread/count/${id}`),
   markRead: (id) => api.put(`/notifications/${id}/read`),
